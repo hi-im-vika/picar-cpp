@@ -18,6 +18,8 @@ CPiCar::~CPiCar() {
 
 void CPiCar::draw() {
     std::cout << "draw" << std::endl;
+
+    // DEBUG: cycles PWM between 1 ms to 2 ms duty cycle
     for (int duty = 0; duty < 100000; duty++) {
         gpioHardwarePWM(STEERING_PIN_BCM,100,100000 + duty);
         gpioHardwarePWM(THROTTLE_PIN_BCM,100,200000 - duty);
