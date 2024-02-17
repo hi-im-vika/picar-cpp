@@ -4,7 +4,6 @@
  * vika <https://github.com/hi-im-vika>
  */
 
-#include <vector>
 #include "../include/CPiControl.h"
 
 CPiControl::CPiControl() {
@@ -27,6 +26,10 @@ void CPiControl::init_gpio(const std::vector<int> &input_pins, std::vector<int> 
             gpioSetMode(i, PI_OUTPUT);
         }
     }
+}
+
+void CPiControl::init_evdev_joystick() {
+
 }
 
 void CPiControl::stop() {

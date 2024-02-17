@@ -10,6 +10,7 @@
 #define THROTTLE_PIN_BCM 13
 
 #include <iostream>
+#include <vector>
 #include <libevdev/libevdev.h>
 #include <pigpio.h>
 
@@ -19,6 +20,7 @@ public:
     ~CPiControl();
     void stop();
     void init_gpio(const std::vector<int> &input_pins, std::vector<int> &output_pins);
+    void init_evdev_joystick();
 private:
     std::string _device;
 };
