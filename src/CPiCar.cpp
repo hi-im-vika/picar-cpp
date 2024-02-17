@@ -13,7 +13,7 @@ CPiCar::~CPiCar() {
 }
 
 void CPiCar::draw() {
-
+    std::cout << "draw" << std::endl;
 }
 
 void CPiCar::update() {
