@@ -8,11 +8,8 @@
 
 
 int main() {
-//    std::cout << "Hello, World!" << std::endl;
     auto cpc = CPiCar();
     cpc.run();
-    std::this_thread::sleep_until(std::chrono::system_clock::now() + std::chrono::milliseconds(2000));
     cpc.stop();
-
     return 0;
 }

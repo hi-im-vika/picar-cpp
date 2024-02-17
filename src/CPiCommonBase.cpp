@@ -7,6 +7,7 @@
 #include "../include/CPiCommonBase.h"
 
 CPiCommonBase::CPiCommonBase() {
+    _control = CPiControl();
     std::thread thread_for_updating(update_thread, this);
     thread_for_updating.detach();
 };

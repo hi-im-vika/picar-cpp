@@ -7,7 +7,7 @@
 #pragma once
 
 #define STEERING_PIN_BCM 12
-#define THROTTLE_PIN_BCM 11
+#define THROTTLE_PIN_BCM 13
 
 #include <iostream>
 #include <libevdev/libevdev.h>
@@ -17,6 +17,8 @@ class CPiControl {
 public:
     CPiControl();
     ~CPiControl();
+    void stop();
+    void init_gpio(const std::vector<int> &input_pins, std::vector<int> &output_pins);
 private:
     std::string _device;
 };
