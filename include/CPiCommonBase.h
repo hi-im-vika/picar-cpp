@@ -55,9 +55,9 @@ public:
 //    static void draw_thread();
 
 protected:
-    CPiControl _control;    ///< Object for GPIO communication.
-    std::string _port;      ///< Name of port to connect to.
-    std::vector<int> _input_pins;
-    std::vector<int> _output_pins;
-    int _do_exit = 0;       ///< Flag to exit program.
+    CPiControl _control;                ///< Object for GPIO communication.
+    std::string _port;                  ///< Name of port to connect to.
+    std::vector<int> _input_pins;       ///< Vector of pins to set as input
+    std::vector<int> _output_pins;      ///< Vector of pins to set as output
+    int _do_exit = 0;                   ///< Flag to exit program.
 };
