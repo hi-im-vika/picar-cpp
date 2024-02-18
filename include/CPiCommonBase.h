@@ -52,7 +52,6 @@ public:
      *
      */
     void stop();
-//    static void draw_thread();
 
 protected:
     CPiControl _control;                ///< Object for GPIO communication.
