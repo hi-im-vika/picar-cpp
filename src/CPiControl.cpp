@@ -82,19 +82,17 @@ void CPiControl::js_get_next_thing() {
              * 17 dpad y (-1 to 1)
              */
             switch (_evdev_dev_event.code) {
-                case 0:
-//                    std::cout << "Got input_event";
-//                    std::cout << " type=" << _evdev_dev_event.type;
-//                    std::cout << " code=" << "left analog x";
-//                    std::cout << " value=" << _evdev_dev_event.value << std::endl;
+                case 0:     // left x
                     _vals[0] = _evdev_dev_event.value;
                     break;
-                case 4:
-//                    std::cout << "Got input_event";
-//                    std::cout << " type=" << _evdev_dev_event.type;
-//                    std::cout << " code=" << "right analog y";
-//                    std::cout << " value=" << _evdev_dev_event.value << std::endl;
+                case 4:     // right y
                     _vals[1] = _evdev_dev_event.value;
+                    break;
+                case 16:    // dpad x
+                    _vals[2] = _evdev_dev_event.value;
+                    break;
+                case 17:    // dpad y
+                    _vals[3] = _evdev_dev_event.value;
                     break;
                 default:
                     break;

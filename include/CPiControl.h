@@ -46,6 +46,8 @@ private:
     };
     std::vector<int> _vals {
             0,
+            0,
+            0,
             0
     };
     std::string _device;

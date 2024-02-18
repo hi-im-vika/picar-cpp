@@ -17,4 +17,6 @@ public:
 private:
     std::vector<int> _last_vals = _control.get_vals();
     int _trim = 0;
+    bool _dpax_prev = false;
+    bool _dpay_prev = false;
 };

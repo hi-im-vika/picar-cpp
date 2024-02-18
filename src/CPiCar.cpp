@@ -28,17 +28,44 @@ CPiCar::~CPiCar() {
 }
 
 void CPiCar::draw() {
-//    std::cout << "draw" << std::endl;
     _last_vals = _control.get_vals();
-    if (_control.get_vals()[0] > 138 || _control.get_vals()[0] < 117) {
-        gpioHardwarePWM(STEERING_PIN_BCM,100,200000 + (int) ((_control.get_vals()[0] / 255.0) * -100000));
-    } else {
-        gpioHardwarePWM(STEERING_PIN_BCM,100,200000 + (int) (0.5 * -100000));
+
+    // trim adjustment
+    if (_last_vals[2] != 0 && !_dpax_prev) {
+        switch(_last_vals[2]) {
+            case -1:
+                _trim--;
+                break;
+            case 1:
+                _trim++;
+                break;
+            default:
+                break;
+        }
+        _dpax_prev = true;
     }
-    if (_control.get_vals()[1] > 138 || _control.get_vals()[1] < 117) {
-        gpioHardwarePWM(THROTTLE_PIN_BCM,100,200000 + (int) ((_control.get_vals()[1] / 255.0) * -100000));
+    if (_last_vals[2] == 0 && _dpax_prev) {
+        _dpax_prev = false;
+    }
+
+//    if (_control.get_vals()[3] && !_dpay_prev) {
+//        std::cout << "dpad y trigger" << std::endl;
+//        _dpay_prev = true;
+//    }
+//
+//    if (_control.get_vals()[3] == 0 && _dpay_prev) {
+//        _dpay_prev = false;
+//    }
+
+    if (_last_vals[0] > 138 || _last_vals[0] < 117) {
+        gpioHardwarePWM(STEERING_PIN_BCM,100,200000 + (int) ((_last_vals[0] / 255.0) * -100000));
     } else {
-        gpioHardwarePWM(THROTTLE_PIN_BCM,100,200000 + (int) (0.5 * -100000));
+        gpioHardwarePWM(STEERING_PIN_BCM,100,200000 + (int) (0.5 * -100000) + (_trim * 1000));
+    }
+    if (_last_vals[1] > 138 || _last_vals[1] < 117) {
+        gpioHardwarePWM(THROTTLE_PIN_BCM,100,200000 + (int) ((_last_vals[1] / 255.0) * -100000));
+    } else {
+        gpioHardwarePWM(THROTTLE_PIN_BCM,100,200000 + (int) (0.5 * -100000) );
     }
 
 //    // DEBUG: (gpioPWM) cycles PWM between 1 ms to 2 ms duty cycle
