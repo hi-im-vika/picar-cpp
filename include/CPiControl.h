@@ -30,9 +30,9 @@ public:
     void stop();
     void init_gpio(const std::vector<int> &input_pins, std::vector<int> &output_pins);
     void init_evdev_joystick();
-    int js_has_new_event();
     void js_get_next_thing();
     std::vector<int> get_vals() { return _vals;};
+    std::string get_device_path() { return _device; };
 private:
     std::vector<std::string> _event_codes = {
             "ls_x",

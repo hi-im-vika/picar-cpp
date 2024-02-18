@@ -58,68 +58,66 @@ void CPiControl::init_evdev_joystick() {
 }
 
 void CPiControl::stop() {
-    gpioTerminate();
+    _device = "";
 }
 
-int CPiControl::js_has_new_event() {
-    if (_evdev_dev != nullptr) return libevdev_has_event_pending(_evdev_dev);
-    return 0;
-}
-
+// catch error when device gone
 void CPiControl::js_get_next_thing() {
-    if (_evdev_dev != nullptr && libevdev_has_event_pending(_evdev_dev)) {
-        libevdev_next_event(_evdev_dev, LIBEVDEV_READ_FLAG_NORMAL, &_evdev_dev_event);
-        if (_evdev_dev_event.type == EV_ABS) {
-            /**
-             * codes
-             * 0 lx
-             * 1 ly
-             * 2 lt
-             * 3 rx
-             * 4 ry
-             * 5 rt
-             * 16 dpad x (-1 to 1)
-             * 17 dpad y (-1 to 1)
-             */
-            switch (_evdev_dev_event.code) {
-                case 0:     // left x
-                    _vals[0] = _evdev_dev_event.value;
-                    break;
-                case 4:     // right y
-                    _vals[1] = _evdev_dev_event.value;
-                    break;
-                case 16:    // dpad x
-                    _vals[2] = _evdev_dev_event.value;
-                    break;
-                case 17:    // dpad y
-                    _vals[3] = _evdev_dev_event.value;
-                    break;
-                default:
-                    break;
+    if (_evdev_dev != nullptr && (libevdev_has_event_pending(_evdev_dev) >= 0)) {
+        if (libevdev_next_event(_evdev_dev, LIBEVDEV_READ_FLAG_NORMAL, &_evdev_dev_event) < 0) {
+        } else {
+            if (_evdev_dev_event.type == EV_ABS) {
+                /**
+                 * codes
+                 * 0 lx
+                 * 1 ly
+                 * 2 lt
+                 * 3 rx
+                 * 4 ry
+                 * 5 rt
+                 * 16 dpad x (-1 to 1)
+                 * 17 dpad y (-1 to 1)
+                 */
+                switch (_evdev_dev_event.code) {
+                    case 0:     // left x
+                        _vals[0] = _evdev_dev_event.value;
+                        break;
+                    case 4:     // right y
+                        _vals[1] = _evdev_dev_event.value;
+                        break;
+                    case 16:    // dpad x
+                        _vals[2] = _evdev_dev_event.value;
+                        break;
+                    case 17:    // dpad y
+                        _vals[3] = _evdev_dev_event.value;
+                        break;
+                    default:
+                        break;
+                }
             }
-        }
 
-        if (_evdev_dev_event.type == EV_KEY) {
-            /**
-             * codes
-             * 310 lb
-             * 311 rb
-             * 312 lt (button)
-             * 313 rt (button)
-             * 304 x
-             * 305 o
-             * 308 square
-             * 307 triangle
-             * 317 ls
-             * 318 rs
-             * 316 home
-             * 314 share
-             * 315 start
-             */
+            if (_evdev_dev_event.type == EV_KEY) {
+                /**
+                 * codes
+                 * 310 lb
+                 * 311 rb
+                 * 312 lt (button)
+                 * 313 rt (button)
+                 * 304 x
+                 * 305 o
+                 * 308 square
+                 * 307 triangle
+                 * 317 ls
+                 * 318 rs
+                 * 316 home
+                 * 314 share
+                 * 315 start
+                 */
 //            std::cout << "Got input_event";
 //            std::cout << " type=" << _evdev_dev_event.type;
 //            std::cout << " code=" << _evdev_dev_event.code;
 //            std::cout << " value=" << _evdev_dev_event.value << std::endl;
+            }
         }
 //            switch (_evdev_dev_event.code) {
 //                case 0:
@@ -139,5 +137,6 @@ void CPiControl::js_get_next_thing() {
 //                default:
 //                    break;
 //        }
+    } else if (_evdev_dev != nullptr && (libevdev_has_event_pending(_evdev_dev) < 0)) {
     }
 }
