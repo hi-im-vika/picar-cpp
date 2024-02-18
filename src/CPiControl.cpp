@@ -17,12 +17,12 @@ CPiControl::~CPiControl() {
 void CPiControl::init_gpio(const std::vector<int> &input_pins, std::vector<int> &output_pins) {
     if (gpioInitialise() < 0) std::exit(-1);
     if (!input_pins.empty()) {
-        for(auto i : input_pins) {
+        for (auto i: input_pins) {
             gpioSetMode(i, PI_INPUT);
         }
     }
     if (!output_pins.empty()) {
-        for (auto i : output_pins) {
+        for (auto i: output_pins) {
             gpioSetMode(i, PI_OUTPUT);
         }
     }
@@ -34,10 +34,10 @@ void CPiControl::init_evdev_joystick() {
     while (_device.empty()) {
         std::cout << "Searching for joystick..." << std::endl;
         // partially from https://stackoverflow.com/a/2340309
-        for (const auto & entry : std::filesystem::directory_iterator("/dev/input")) {
+        for (const auto &entry: std::filesystem::directory_iterator("/dev/input")) {
             if (entry.path().string().find("event") != std::string::npos) {
                 // from libevdev sample code
-                auto fd = open(entry.path().string().c_str(), O_RDONLY|O_NONBLOCK);
+                auto fd = open(entry.path().string().c_str(), O_RDONLY | O_NONBLOCK);
                 struct libevdev *dev = nullptr;
                 int rc = libevdev_new_from_fd(fd, &dev);
 
@@ -51,7 +51,7 @@ void CPiControl::init_evdev_joystick() {
         std::this_thread::sleep_until(std::chrono::system_clock::now() + std::chrono::milliseconds(100));
     }
     std::cout << "Joystick found at " << _device << std::endl;
-    _joystick_fd = open(_device.c_str(), O_RDONLY|O_NONBLOCK);
+    _joystick_fd = open(_device.c_str(), O_RDONLY | O_NONBLOCK);
 
     // TODO: handle if joystick cannot connect here
     libevdev_new_from_fd(_joystick_fd, &_evdev_dev);
@@ -69,24 +69,77 @@ int CPiControl::js_has_new_event() {
 void CPiControl::js_get_next_thing() {
     if (_evdev_dev != nullptr && libevdev_has_event_pending(_evdev_dev)) {
         libevdev_next_event(_evdev_dev, LIBEVDEV_READ_FLAG_NORMAL, &_evdev_dev_event);
-        if (_evdev_dev_event.type == EV_ABS)
+        if (_evdev_dev_event.type == EV_ABS) {
+            /**
+             * codes
+             * 0 lx
+             * 1 ly
+             * 2 lt
+             * 3 rx
+             * 4 ry
+             * 5 rt
+             * 16 dpad x (-1 to 1)
+             * 17 dpad y (-1 to 1)
+             */
             switch (_evdev_dev_event.code) {
                 case 0:
-                    std::cout << "Got input_event";
-                    std::cout << " type=" << _evdev_dev_event.type;
-                    std::cout << " code=" << "left analog x";
-                    std::cout << " value=" << _evdev_dev_event.value << std::endl;
+//                    std::cout << "Got input_event";
+//                    std::cout << " type=" << _evdev_dev_event.type;
+//                    std::cout << " code=" << "left analog x";
+//                    std::cout << " value=" << _evdev_dev_event.value << std::endl;
                     _vals[0] = _evdev_dev_event.value;
                     break;
                 case 4:
-                    std::cout << "Got input_event";
-                    std::cout << " type=" << _evdev_dev_event.type;
-                    std::cout << " code=" << "right analog y";
-                    std::cout << " value=" << _evdev_dev_event.value << std::endl;
+//                    std::cout << "Got input_event";
+//                    std::cout << " type=" << _evdev_dev_event.type;
+//                    std::cout << " code=" << "right analog y";
+//                    std::cout << " value=" << _evdev_dev_event.value << std::endl;
                     _vals[1] = _evdev_dev_event.value;
                     break;
                 default:
                     break;
+            }
         }
+
+        if (_evdev_dev_event.type == EV_KEY) {
+            /**
+             * codes
+             * 310 lb
+             * 311 rb
+             * 312 lt (button)
+             * 313 rt (button)
+             * 304 x
+             * 305 o
+             * 308 square
+             * 307 triangle
+             * 317 ls
+             * 318 rs
+             * 316 home
+             * 314 share
+             * 315 start
+             */
+//            std::cout << "Got input_event";
+//            std::cout << " type=" << _evdev_dev_event.type;
+//            std::cout << " code=" << _evdev_dev_event.code;
+//            std::cout << " value=" << _evdev_dev_event.value << std::endl;
+        }
+//            switch (_evdev_dev_event.code) {
+//                case 0:
+//                    std::cout << "Got input_event";
+//                    std::cout << " type=" << _evdev_dev_event.type;
+//                    std::cout << " code=" << "left analog x";
+//                    std::cout << " value=" << _evdev_dev_event.value << std::endl;
+//                    _vals[0] = _evdev_dev_event.value;
+//                    break;
+//                case 4:
+//                    std::cout << "Got input_event";
+//                    std::cout << " type=" << _evdev_dev_event.type;
+//                    std::cout << " code=" << "right analog y";
+//                    std::cout << " value=" << _evdev_dev_event.value << std::endl;
+//                    _vals[1] = _evdev_dev_event.value;
+//                    break;
+//                default:
+//                    break;
+//        }
     }
 }
