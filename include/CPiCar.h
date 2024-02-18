@@ -14,4 +14,7 @@ public:
     ~CPiCar();
     void draw() override;
     void update() override;
+private:
+    std::vector<int> _last_vals = _control.get_vals();
+    int _trim = 0;
 };
