@@ -19,7 +19,7 @@ CPiCar::CPiCar() {
 //    gpioSetPWMfrequency(THROTTLE_PIN_BCM,100);
 //    gpioPWM(STEERING_PIN_BCM,6000);
 //    gpioPWM(THROTTLE_PIN_BCM,6000);
-    gpioWrite(HEARTBEAT_PIN_BCM, PI_ON);
+//    gpioWrite(HEARTBEAT_PIN_BCM, PI_ON);
     _control.init_evdev_joystick();
 }
 
@@ -87,5 +87,18 @@ void CPiCar::draw() {
 
 void CPiCar::update() {
 //    std::cout << "update" << std::endl;
+    if (_do_heartbeat) heartbeat();
     _control.js_get_next_thing();
+}
+
+void CPiCar::heartbeat() {
+    long long now = (int) std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - CPiCar::_start).count();
+    if ((!(now % 1000) && now != _last_time) || (!((now % 1000) - 200) && now != _last_time)) {
+        gpioWrite(HEARTBEAT_PIN_BCM, PI_ON);
+        _last_time = now;
+    }
+    if ((!((now % 1000) - 50) && now != _last_time) || (!((now % 1000) - 250) && now != _last_time)) {
+        gpioWrite(HEARTBEAT_PIN_BCM, PI_OFF);
+        _last_time = now;
+    }
 }
