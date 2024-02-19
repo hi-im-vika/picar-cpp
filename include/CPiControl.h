@@ -56,8 +56,8 @@
 
 class CPiControl {
 public:
-    CPiControl();
-    ~CPiControl();
+    CPiControl() = default;
+    ~CPiControl() = default;
     void stop();
     void init_gpio(const std::vector<int> &input_pins, std::vector<int> &output_pins);
     void init_evdev_joystick();
@@ -65,16 +65,6 @@ public:
     std::vector<int> get_js_values() { return _vals;};
     std::string get_device_path() { return _device; };
 private:
-    std::vector<std::string> _event_codes = {
-            "ls_x",
-            "ls_y",
-            "lt",
-            "rs_x",
-            "rs_y",
-            "rt",
-            "dpad_x",
-            "dpad_y"
-    };
     std::vector<int> _vals {
             127,            // VECT_LEFT_XAXIS
             127,            // VECT_RIGHT_YAXIS

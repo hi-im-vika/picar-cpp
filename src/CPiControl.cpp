@@ -6,14 +6,6 @@
 
 #include "../include/CPiControl.h"
 
-CPiControl::CPiControl() {
-    _device = "";
-}
-
-CPiControl::~CPiControl() {
-    gpioTerminate();
-}
-
 void CPiControl::init_gpio(const std::vector<int> &input_pins, std::vector<int> &output_pins) {
     if (gpioInitialise() < 0) std::exit(-1);
     if (!input_pins.empty()) {
