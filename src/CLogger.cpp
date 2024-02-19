@@ -14,7 +14,7 @@
 //    return _clogger;
 //}
 
-void CLogger::show_log(std::string source, std::string level, std::string content) {
+void CLogger::show_log(const std::string& source, const std::string& level, const std::string& content) {
     auto now = std::chrono::system_clock::now();
     std::cout << std::chrono::system_clock::to_time_t(now);
     std::cout << " [";

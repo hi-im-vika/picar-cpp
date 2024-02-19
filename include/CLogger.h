@@ -17,7 +17,7 @@ class CLogger {
 public:
     CLogger() = default;
     ~CLogger() = default;
-    void show_log(std::string source, std::string level, std::string content);
+    void show_log(const std::string& source, const std::string& level, const std::string& content);
 private:
 //protected:
 //    CLogger() = default;
