@@ -8,13 +8,15 @@
 
 CPiCommonBase::CPiCommonBase() {
     _control = CPiControl();
-    std::thread thread_for_updating(update_thread, this);
-    thread_for_updating.detach();
+    _logger = CLogger();
+    _logger.show_log("CPiCommonBase", "INFO", "Starting CPiCommonBase");
 };
 
 CPiCommonBase::~CPiCommonBase() = default;
 
 void CPiCommonBase::run() {
+    std::thread thread_for_updating(update_thread, this);
+    thread_for_updating.detach();
     do {
         draw();
     } while (!_do_exit);
