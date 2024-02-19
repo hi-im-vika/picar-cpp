@@ -29,28 +29,35 @@ void CPiControl::init_gpio(const std::vector<int> &input_pins, std::vector<int> 
 }
 
 void CPiControl::init_evdev_joystick() {
-    std::cout << "joystick init" << std::endl;
 
     while (_device.empty()) {
         std::cout << "Searching for joystick..." << std::endl;
         // partially from https://stackoverflow.com/a/2340309
         for (const auto &entry: std::filesystem::directory_iterator("/dev/input")) {
             if (entry.path().string().find("event") != std::string::npos) {
+
                 // from libevdev sample code
+                // open file descriptor for selected file descriptor
                 auto fd = open(entry.path().string().c_str(), O_RDONLY | O_NONBLOCK);
+
+                // create libevdev struct
                 struct libevdev *dev = nullptr;
-                int rc = libevdev_new_from_fd(fd, &dev);
+
+                // update libevdev struct with details from file descriptor
+                libevdev_new_from_fd(fd, &dev);
 
                 // looking for the dualshock 4
                 if (std::string(libevdev_get_name(dev)) == "Wireless Controller") {
                     _device = entry.path().string();
                 }
-                int close(fd);
+
+                // clean up
+                close(fd);
             }
         }
         std::this_thread::sleep_until(std::chrono::system_clock::now() + std::chrono::milliseconds(100));
     }
-    std::cout << "Joystick found at " << _device << std::endl;
+
     _joystick_fd = open(_device.c_str(), O_RDONLY | O_NONBLOCK);
 
     // TODO: handle if joystick cannot connect here
@@ -59,6 +66,7 @@ void CPiControl::init_evdev_joystick() {
 
 void CPiControl::stop() {
     _device = "";
+    close(_joystick_fd);
 }
 
 // catch error when device gone
@@ -67,29 +75,18 @@ void CPiControl::js_get_next_thing() {
         if (libevdev_next_event(_evdev_dev, LIBEVDEV_READ_FLAG_NORMAL, &_evdev_dev_event) < 0) {
         } else {
             if (_evdev_dev_event.type == EV_ABS) {
-                /**
-                 * codes
-                 * 0 lx
-                 * 1 ly
-                 * 2 lt
-                 * 3 rx
-                 * 4 ry
-                 * 5 rt
-                 * 16 dpad x (-1 to 1)
-                 * 17 dpad y (-1 to 1)
-                 */
                 switch (_evdev_dev_event.code) {
-                    case 0:     // left x
-                        _vals[0] = _evdev_dev_event.value;
+                    case DS4_LEFT_XAXIS_EVCODE:
+                        _vals[VECT_LEFT_XAXIS] = _evdev_dev_event.value;
                         break;
-                    case 4:     // right y
-                        _vals[1] = _evdev_dev_event.value;
+                    case DS4_RIGHT_YAXIS_EVCODE:
+                        _vals[VECT_RIGHT_YAXIS] = _evdev_dev_event.value;
                         break;
-                    case 16:    // dpad x
-                        _vals[2] = _evdev_dev_event.value;
+                    case DS4_DPAD_XAXIS_EVCODE:
+                        _vals[VECT_DPAD_XAXIS] = _evdev_dev_event.value;
                         break;
-                    case 17:    // dpad y
-                        _vals[3] = _evdev_dev_event.value;
+                    case DS4_DPAD_YAXIS_EVCODE:
+                        _vals[VECT_DPAD_YAXIS] = _evdev_dev_event.value;
                         break;
                     default:
                         break;
@@ -97,22 +94,6 @@ void CPiControl::js_get_next_thing() {
             }
 
             if (_evdev_dev_event.type == EV_KEY) {
-                /**
-                 * codes
-                 * 310 lb
-                 * 311 rb
-                 * 312 lt (button)
-                 * 313 rt (button)
-                 * 304 x
-                 * 305 o
-                 * 308 square
-                 * 307 triangle
-                 * 317 ls
-                 * 318 rs
-                 * 316 home
-                 * 314 share
-                 * 315 start
-                 */
 //            std::cout << "Got input_event";
 //            std::cout << " type=" << _evdev_dev_event.type;
 //            std::cout << " code=" << _evdev_dev_event.code;
@@ -137,6 +118,5 @@ void CPiControl::js_get_next_thing() {
 //                default:
 //                    break;
 //        }
-    } else if (_evdev_dev != nullptr && (libevdev_has_event_pending(_evdev_dev) < 0)) {
     }
 }
