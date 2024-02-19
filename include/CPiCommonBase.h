@@ -10,6 +10,7 @@
 #include <chrono>
 #include <thread>
 #include "CPiControl.h"
+#include "CLogger.h"
 
 /**
  * @brief A class designed to be inherited from to provide functions common to all
@@ -54,6 +55,7 @@ public:
     void stop();
 
 protected:
+    CLogger _logger;
     CPiControl _control;                ///< Object for GPIO communication.
     std::string _port;                  ///< Name of port to connect to.
     std::vector<int> _input_pins;       ///< Vector of pins to set as input

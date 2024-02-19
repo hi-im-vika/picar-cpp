@@ -9,7 +9,7 @@
 CPiCommonBase::CPiCommonBase() {
     _control = CPiControl();
     _logger = CLogger();
-    _logger.show_log("CPiCommonBase", "INFO", "Starting CPiCommonBase");
+    _logger.show_log("CPiCommonBase", "INFO", "Starting program");
 };
 
 CPiCommonBase::~CPiCommonBase() = default;
