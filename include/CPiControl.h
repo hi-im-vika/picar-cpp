@@ -76,10 +76,10 @@ private:
             "dpad_y"
     };
     std::vector<int> _vals {
-            0,
-            0,
-            0,
-            0
+            127,            // VECT_LEFT_XAXIS
+            127,            // VECT_RIGHT_YAXIS
+            0,              // VECT_DPAD_XAXIS
+            0               // VECT_DPAD_YAXIS
     };
     std::string _device;
     struct libevdev *_evdev_dev = nullptr;

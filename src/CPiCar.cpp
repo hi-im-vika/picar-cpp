@@ -32,6 +32,8 @@ CPiCar::~CPiCar() {
 void CPiCar::draw() {
     // TODO: implement safe mode on controller disconnect
     if (!_do_draw) {
+        // if _draw is not asserted
+
         // send a log every second, no need for all the time
         long long now = (int) std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::steady_clock::now() - CPiCar::_start).count();
@@ -44,11 +46,13 @@ void CPiCar::draw() {
         gpioHardwarePWM(STEERING_PIN_BCM, 100, 150000);
         gpioHardwarePWM(THROTTLE_PIN_BCM, 100, 150000);
     } else {
+        // if _draw asserted
 
         // get joystick values
         _last_js_values = _control.get_js_values();
 
         // perform trim adjustment
+        // TODO: save trim values
         if (_last_js_values[VECT_DPAD_XAXIS] != 0 && !_dpad_pressed_x) {
             switch (_last_js_values[VECT_DPAD_XAXIS]) {
                 case -1:
@@ -60,6 +64,7 @@ void CPiCar::draw() {
                 default:
                     break;
             }
+            _logger.show_log("CPiCar", "INFO", "New trim value: " + std::to_string(_trim));
             _dpad_pressed_x = true;
         }
         if (_last_js_values[VECT_DPAD_XAXIS] == 0 && _dpad_pressed_x) {
@@ -68,14 +73,14 @@ void CPiCar::draw() {
 
         // if greater than deadzone threshold
         if (_last_js_values[VECT_LEFT_XAXIS] > 138 || _last_js_values[VECT_LEFT_XAXIS] < 117) {
-            gpioHardwarePWM(STEERING_PIN_BCM, 100, 200000 + (int) ((_last_js_values[VECT_LEFT_XAXIS] / 255.0) * -100000));
+            gpioHardwarePWM(STEERING_PIN_BCM, 100, 150000 + (int) (((_last_js_values[VECT_LEFT_XAXIS] - 127) / 255.0) * -100000));
         } else {
-            gpioHardwarePWM(STEERING_PIN_BCM, 100, 200000 + -50000 + (_trim * 1000));
+            gpioHardwarePWM(STEERING_PIN_BCM, 100, 150000 + (_trim * 1000));
         }
         if (_last_js_values[VECT_RIGHT_YAXIS] > 138 || _last_js_values[VECT_RIGHT_YAXIS] < 117) {
-            gpioHardwarePWM(THROTTLE_PIN_BCM, 100, 200000 + (int) ((_last_js_values[VECT_RIGHT_YAXIS] / 255.0) * -100000));
+            gpioHardwarePWM(THROTTLE_PIN_BCM, 100, 150000 + (int) (((_last_js_values[VECT_RIGHT_YAXIS] - 127) / 255.0) * -100000));
         } else {
-            gpioHardwarePWM(THROTTLE_PIN_BCM, 100, 200000 + -50000);
+            gpioHardwarePWM(THROTTLE_PIN_BCM, 100, 150000);
         }
 
 //    // DEBUG: (gpioPWM) cycles PWM between 1 ms to 2 ms duty cycle
