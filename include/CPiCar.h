@@ -18,10 +18,10 @@ public:
     void joystick();
     static void joystick_thread(CPiCar *who_called_me);
 private:
-    std::vector<int> _last_vals = _control.get_vals();
+    std::vector<int> _last_js_values;
     int _trim = 0;
-    bool _dpax_prev = false;
-    bool _dpay_prev = false;
+    bool _dpad_pressed_x = false;
+    bool _dpad_pressed_y = false;
     bool _do_heartbeat = true;
     bool _do_draw = false;
     bool _found_joystick = false;
