@@ -84,5 +84,5 @@ private:
     std::string _device;
     struct libevdev *_evdev_dev = nullptr;
     struct input_event _evdev_dev_event = {};
-    int _joystick_fd;
+    int _joystick_fd = 0;
 };
