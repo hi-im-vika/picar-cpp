@@ -7,6 +7,7 @@
 #pragma once
 
 #include "CPiCommonBase.h"
+#include "CVision.h"
 
 class CPiCar : public CPiCommonBase {
 public:

@@ -44,6 +44,10 @@ add_executable(${CMAKE_PROJECT_NAME}
         src/CLogger.cpp
         include/CLogger.h
         include/CLogger.h
+        src/CVision.cpp
+        include/CVision.h
+        ../../../../../../../../../../CVision.h
+        ../../../../../../../../../../CVision.cpp
 )
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE Boost::headers ${OpenCV_LIBS} ${EVDEV_LIBRARIES} ${PIGPIO_LIBS})
