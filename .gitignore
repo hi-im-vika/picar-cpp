@@ -11,6 +11,7 @@ html
 
 # Other excluded files
 *.pdf
+*.dwf3work
 
 # macOS specific
 
