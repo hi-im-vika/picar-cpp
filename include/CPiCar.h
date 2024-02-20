@@ -20,6 +20,7 @@ public:
 private:
     std::vector<int> _last_js_values;
     int _trim = 0;
+    int _throttle_trim = 0;
     bool _dpad_pressed_x = false;
     bool _dpad_pressed_y = false;
     bool _do_heartbeat = true;

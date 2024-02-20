@@ -75,6 +75,26 @@ void CPiCar::draw() {
             _dpad_pressed_x = false;
         }
 
+        // perform throttle adjustment
+        // TODO: save trim values
+        if (_last_js_values[VECT_DPAD_YAXIS] && !_dpad_pressed_y) {
+            switch (_last_js_values[VECT_DPAD_YAXIS]) {
+                case -1:
+                    _throttle_trim++;
+                    break;
+                case 1:
+                    _throttle_trim--;
+                    break;
+                default:
+                    break;
+            }
+            _logger.show_log("CPiCar", "INFO", "New throttle trim value: " + std::to_string(_throttle_trim * 100));
+            _dpad_pressed_y = true;
+        }
+        if (!_last_js_values[VECT_DPAD_YAXIS] && _dpad_pressed_y) {
+            _dpad_pressed_y = false;
+        }
+
         // if greater than deadzone threshold
         if (abs(centred_value_left_xaxis) > 10) {
             gpioHardwarePWM(STEERING_PIN_BCM, 100, 150000 + (int) ((centred_value_left_xaxis / 255.0) * -100000));
