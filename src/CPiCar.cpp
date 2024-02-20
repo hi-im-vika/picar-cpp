@@ -30,7 +30,6 @@ CPiCar::~CPiCar() {
 
 // yeah its draw but you know what i mean
 void CPiCar::draw() {
-    // TODO: implement safe mode on controller disconnect
     if (!_do_draw) {
         // if _draw is not asserted
 
