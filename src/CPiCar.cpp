@@ -48,64 +48,10 @@ void CPiCar::draw() {
     } else {
         // if _draw asserted
 
-        // get joystick values
-        _last_js_values = _control.get_js_values();
-        int centred_value_left_xaxis = _last_js_values[VECT_LEFT_XAXIS] - 127;
-        int centred_value_right_yaxis = _last_js_values[VECT_RIGHT_YAXIS] - 127;
-
-        // perform trim adjustment
-        // TODO: save trim values
-
-        // debounce for one press
-        if (_last_js_values[VECT_DPAD_XAXIS] && !_dpad_pressed_x) {
-            switch (_last_js_values[VECT_DPAD_XAXIS]) {
-                case -1:
-                    _trim++;
-                    break;
-                case 1:
-                    _trim--;
-                    break;
-                default:
-                    break;
-            }
-            _logger.show_log("CPiCar", "INFO", "New trim value: " + std::to_string(_trim));
-            _dpad_pressed_x = true;
-        }
-        if (!_last_js_values[VECT_DPAD_XAXIS] && _dpad_pressed_x) {
-            _dpad_pressed_x = false;
-        }
-
-        // perform throttle adjustment
-        // TODO: save trim values
-        if (_last_js_values[VECT_DPAD_YAXIS] && !_dpad_pressed_y) {
-            switch (_last_js_values[VECT_DPAD_YAXIS]) {
-                case -1:
-                    _throttle_trim++;
-                    break;
-                case 1:
-                    _throttle_trim--;
-                    break;
-                default:
-                    break;
-            }
-            _logger.show_log("CPiCar", "INFO", "New throttle trim value: " + std::to_string(_throttle_trim * 100));
-            _dpad_pressed_y = true;
-        }
-        if (!_last_js_values[VECT_DPAD_YAXIS] && _dpad_pressed_y) {
-            _dpad_pressed_y = false;
-        }
-
-        // if greater than deadzone threshold
-        if (abs(centred_value_left_xaxis) > 10) {
-            gpioHardwarePWM(STEERING_PIN_BCM, 100, 150000 + (int) ((centred_value_left_xaxis / 255.0) * -100000));
+        if (_do_auto) {
+            process_vision();
         } else {
-            gpioHardwarePWM(STEERING_PIN_BCM, 100, 150000 + (_trim * 1000));
-        }
-        if (abs(centred_value_right_yaxis) > 1) {
-            gpioHardwarePWM(THROTTLE_PIN_BCM, 100, 150000 + (int) ((centred_value_right_yaxis / 255.0) * -100000));
-        } else {
-            // lowest level surface acceleration duration (brushless, with kickstart): 150000 + 8800
-            gpioHardwarePWM(THROTTLE_PIN_BCM, 100, 150000 + (_throttle_trim * 100));
+            process_joystick();
         }
 
 //    // DEBUG: (gpioPWM) cycles PWM between 1 ms to 2 ms duty cycle
@@ -141,6 +87,72 @@ void CPiCar::heartbeat() {
     if ((!((now % 1000) - 50) && now != _last_heartbeat) || (!((now % 1000) - 250) && now != _last_heartbeat)) {
         gpioWrite(HEARTBEAT_PIN_BCM, PI_OFF);
         _last_heartbeat = now;
+    }
+}
+
+void CPiCar::process_vision() {
+
+}
+
+void CPiCar::process_joystick() {
+    // get joystick values
+    _last_js_values = _control.get_js_values();
+    int centred_value_left_xaxis = _last_js_values[VECT_LEFT_XAXIS] - 127;
+    int centred_value_right_yaxis = _last_js_values[VECT_RIGHT_YAXIS] - 127;
+
+    // perform trim adjustment
+    // TODO: save trim values
+
+    // debounce for one press
+    if (_last_js_values[VECT_DPAD_XAXIS] && !_dpad_pressed_x) {
+        switch (_last_js_values[VECT_DPAD_XAXIS]) {
+            case -1:
+                _trim++;
+                break;
+            case 1:
+                _trim--;
+                break;
+            default:
+                break;
+        }
+        _logger.show_log("CPiCar", "INFO", "New trim value: " + std::to_string(_trim));
+        _dpad_pressed_x = true;
+    }
+    if (!_last_js_values[VECT_DPAD_XAXIS] && _dpad_pressed_x) {
+        _dpad_pressed_x = false;
+    }
+
+    // perform throttle adjustment
+    // TODO: save trim values
+    if (_last_js_values[VECT_DPAD_YAXIS] && !_dpad_pressed_y) {
+        switch (_last_js_values[VECT_DPAD_YAXIS]) {
+            case -1:
+                _throttle_trim++;
+                break;
+            case 1:
+                _throttle_trim--;
+                break;
+            default:
+                break;
+        }
+        _logger.show_log("CPiCar", "INFO", "New throttle trim value: " + std::to_string(_throttle_trim * 100));
+        _dpad_pressed_y = true;
+    }
+    if (!_last_js_values[VECT_DPAD_YAXIS] && _dpad_pressed_y) {
+        _dpad_pressed_y = false;
+    }
+
+    // if greater than deadzone threshold
+    if (abs(centred_value_left_xaxis) > 10) {
+        gpioHardwarePWM(STEERING_PIN_BCM, 100, 150000 + (int) ((centred_value_left_xaxis / 255.0) * -100000));
+    } else {
+        gpioHardwarePWM(STEERING_PIN_BCM, 100, 150000 + (_trim * 1000));
+    }
+    if (abs(centred_value_right_yaxis) > 1) {
+        gpioHardwarePWM(THROTTLE_PIN_BCM, 100, 150000 + (int) ((centred_value_right_yaxis / 255.0) * -100000));
+    } else {
+        // lowest level surface acceleration duration (brushless, with kickstart): 150000 + 8800
+        gpioHardwarePWM(THROTTLE_PIN_BCM, 100, 150000 + (_throttle_trim * 100));
     }
 }
 

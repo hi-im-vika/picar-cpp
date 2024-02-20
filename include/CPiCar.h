@@ -19,6 +19,8 @@ public:
     void joystick();
     static void joystick_thread(CPiCar *who_called_me);
 private:
+    void process_joystick();
+    void process_vision();
     std::vector<int> _last_js_values;
     int _trim = 0;
     int _throttle_trim = 0;
@@ -26,6 +28,7 @@ private:
     bool _dpad_pressed_y = false;
     bool _do_heartbeat = true;
     bool _do_draw = false;
+    bool _do_auto = false;
     bool _found_joystick = false;
     long long _last_time = 0;
     std::chrono::steady_clock::time_point _start;       ///< Start time to schedule interrupts
