@@ -50,10 +50,14 @@ void CPiCar::draw() {
 
         // get joystick values
         _last_js_values = _control.get_js_values();
+        int centred_value_left_xaxis = _last_js_values[VECT_LEFT_XAXIS] - 127;
+        int centred_value_right_yaxis = _last_js_values[VECT_RIGHT_YAXIS] - 127;
 
         // perform trim adjustment
         // TODO: save trim values
-        if (_last_js_values[VECT_DPAD_XAXIS] != 0 && !_dpad_pressed_x) {
+
+        // debounce for one press
+        if (_last_js_values[VECT_DPAD_XAXIS] && !_dpad_pressed_x) {
             switch (_last_js_values[VECT_DPAD_XAXIS]) {
                 case -1:
                     _trim++;
@@ -67,20 +71,21 @@ void CPiCar::draw() {
             _logger.show_log("CPiCar", "INFO", "New trim value: " + std::to_string(_trim));
             _dpad_pressed_x = true;
         }
-        if (_last_js_values[VECT_DPAD_XAXIS] == 0 && _dpad_pressed_x) {
+        if (!_last_js_values[VECT_DPAD_XAXIS] && _dpad_pressed_x) {
             _dpad_pressed_x = false;
         }
 
         // if greater than deadzone threshold
-        if (_last_js_values[VECT_LEFT_XAXIS] > 138 || _last_js_values[VECT_LEFT_XAXIS] < 117) {
-            gpioHardwarePWM(STEERING_PIN_BCM, 100, 150000 + (int) (((_last_js_values[VECT_LEFT_XAXIS] - 127) / 255.0) * -100000));
+        if (abs(centred_value_left_xaxis) > 10) {
+            gpioHardwarePWM(STEERING_PIN_BCM, 100, 150000 + (int) ((centred_value_left_xaxis / 255.0) * -100000));
         } else {
             gpioHardwarePWM(STEERING_PIN_BCM, 100, 150000 + (_trim * 1000));
         }
-        if (_last_js_values[VECT_RIGHT_YAXIS] > 138 || _last_js_values[VECT_RIGHT_YAXIS] < 117) {
-            gpioHardwarePWM(THROTTLE_PIN_BCM, 100, 150000 + (int) (((_last_js_values[VECT_RIGHT_YAXIS] - 127) / 255.0) * -100000));
+        if (abs(centred_value_right_yaxis) > 1) {
+            gpioHardwarePWM(THROTTLE_PIN_BCM, 100, 150000 + (int) ((centred_value_right_yaxis / 255.0) * -100000));
         } else {
-            gpioHardwarePWM(THROTTLE_PIN_BCM, 100, 150000);
+            // lowest level surface acceleration duration (brushless, with kickstart): 150000 + 8800
+            gpioHardwarePWM(THROTTLE_PIN_BCM, 100, 150000 + (_throttle_trim * 100));
         }
 
 //    // DEBUG: (gpioPWM) cycles PWM between 1 ms to 2 ms duty cycle
