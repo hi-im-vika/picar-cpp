@@ -96,7 +96,7 @@ void CPiCar::draw() {
 
         // if greater than deadzone threshold
         if (abs(centred_value_left_xaxis) > 10) {
-            gpioHardwarePWM(STEERING_PIN_BCM, 100, 150000 + (int) ((centred_value_left_xaxis / 255.0) * -100000));
+            gpioHardwarePWM(STEERING_PIN_BCM, 100, 150000 + (int) ((centred_value_left_xaxis / 255.0) * 100000));
         } else {
             gpioHardwarePWM(STEERING_PIN_BCM, 100, 150000 + (_trim * 1000));
         }
